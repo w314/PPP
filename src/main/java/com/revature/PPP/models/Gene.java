@@ -1,7 +1,10 @@
 package com.revature.PPP.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @Entity
@@ -15,13 +18,23 @@ public class Gene {
     @Column(nullable = false)
     private String chromosome;
 
+    // the one side of the one to many relationship between gene and their diseases
+    // mapped by the gene field in Class Disease
+    // cascade and oprhanRemoval make sure if we delete a gene all their diseases are deleted too
+    @OneToMany(mappedBy = "gene", cascade = CascadeType.ALL, orphanRemoval = true)
+    // @JsonManagedReference is needed to avoid infinite loops when converting objects to JSON
+    // this setup will show the list of diseases a gene has when printing out the gene
+    @JsonManagedReference
+    private List<Disease> diseases;
+
     public Gene() {
     }
 
-    public Gene(int geneId, String geneName, String chromosome) {
+    public Gene(int geneId, String geneName, String chromosome, List<Disease> diseases) {
         this.geneId = geneId;
         this.geneName = geneName;
         this.chromosome = chromosome;
+        this.diseases = diseases;
     }
 
     public int getGeneId() {
@@ -40,11 +53,21 @@ public class Gene {
         this.chromosome = chromosome;
     }
 
+    public List<Disease> getDiseases() {
+        return diseases;
+    }
+
+    public void setDiseases(List<Disease> diseases) {
+        this.diseases = diseases;
+    }
+
     @Override
     public String toString() {
         return "Gene{" +
                 "geneId=" + geneId +
+                ", geneName='" + geneName + '\'' +
                 ", chromosome='" + chromosome + '\'' +
+                ", diseases=" + diseases +
                 '}';
     }
 

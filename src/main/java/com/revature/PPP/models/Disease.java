@@ -1,5 +1,6 @@
 package com.revature.PPP.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,11 @@ public class Disease {
     private String severity;
 
     // Multiple diseases can be associated with the same gene
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @ManyToOne(fetch = FetchType.EAGER)
+    // @JsonBackReference is needed to avoid infinite loops when converting objects to JSON
+    // the gene is not printed when printing out disease
+    // but all diseases associated with a gene will be printed when printing a gene
+    @JsonBackReference
     @JoinColumn(name = "geneId")
     private Gene gene;
 
@@ -28,10 +33,11 @@ public class Disease {
     public Disease() {
     }
 
-    public Disease(int diseaseId, String diseaseName, String severity) {
+    public Disease(int diseaseId, String diseaseName, String severity, Gene gene) {
         this.diseaseId = diseaseId;
         this.diseaseName = diseaseName;
         this.severity = severity;
+        this.gene = gene;
     }
 
     public int getDiseaseId() {
@@ -74,4 +80,15 @@ public class Disease {
                 ", severity='" + severity + '\'' +
                 '}';
     }
+
+//
+//    @Override
+//    public String toString() {
+//        return "Disease{" +
+//                "diseaseId=" + diseaseId +
+//                ", diseaseName='" + diseaseName + '\'' +
+//                ", severity='" + severity + '\'' +
+//                ", gene=" + gene +
+//                '}';
+//    }
 }

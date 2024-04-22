@@ -69,6 +69,28 @@ public class GeneController {
         return ResponseEntity.status(201).body(g);
     }
 
+    // delete gene by id ( and all it's attached diseases )
+    @DeleteMapping("/{geneId}")
+    public ResponseEntity<Object> deleteGeneById(@PathVariable int geneId) {
+
+        // check if requested gene ID exists
+        Optional geneOptional = geneDAO.findById(geneId);
+
+        // if there is no such gene send a bad request response
+        if(geneOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("There is no gene with ID: " + geneId);
+        }
+
+        // if there was a gene with that id get it from the Optional container
+        Gene gene = (Gene) geneOptional.get();
+
+        // delete gene from the database
+        geneDAO.deleteById(geneId);
+
+        // send response with deleted gene
+        return ResponseEntity.ok(gene);
+    }
+
 //    // Update a  Gene
 //    @PutMapping("/{geneId}")
 //    public ResponseEntity<Gene> updateGene(@RequestBody Gene gene, @PathVariable int geneId){
