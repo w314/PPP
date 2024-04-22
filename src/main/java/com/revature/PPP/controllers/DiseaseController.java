@@ -127,6 +127,35 @@ public class DiseaseController {
         return ResponseEntity.ok(d);
 
     }
+//
+//    // updates the disease (with the disease id in the URI) with the new values provided
+//    @PutMapping("/{diseaseId}")
+//    public ResponseEntity<Object> updateADisease(@PathVariable int diseaseId, @RequestBody Disease disease) {
+//
+//        // check if disease ID is valid
+//        Optional<Disease> diseaseOptional = diseaseDAO.findById(diseaseId);
+//
+//        // if there is no disease with the provided id return bad not found error
+//        if(diseaseOptional.isEmpty()) {
+//            return ResponseEntity.status(404).body("There is no disease with ID: " + diseaseId);
+//        }
+//
+//        // if we have the disease get it from the Optional container
+//        Disease d =  (Disease) diseaseOptional.get();
+//
+//        // update old values with the new ones
+//        d.setDiseaseName(disease.getDiseaseName());
+//        d.setSeverity(disease.getSeverity());
+//        d.setGene(disease.getGene());
+//
+//        // save our updated disease to the DB
+//        Disease updatedDisease = diseaseDAO.save(disease);
+//
+//        // send response with the updated disease in the body
+//        return ResponseEntity.ok().body(updatedDisease);
+//    }
+
+
     // Delete a Disease by its ID
     @DeleteMapping("/{diseaseId}")
     public ResponseEntity<Object> deleteDisease(@PathVariable int diseaseId){
