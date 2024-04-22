@@ -1,5 +1,6 @@
 package com.revature.PPP.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
@@ -20,11 +21,12 @@ public class Gene {
 
     // the one side of the one to many relationship between gene and their diseases
     // mapped by the gene field in Class Disease
-    // cascade and oprhanRemoval make sure if we delete a gene all their diseases are deleted too
+    // cascade and orphanRemoval make sure if we delete a gene all their diseases are deleted too
     @OneToMany(mappedBy = "gene", cascade = CascadeType.ALL, orphanRemoval = true)
-    // @JsonManagedReference is needed to avoid infinite loops when converting objects to JSON
-    // this setup will show the list of diseases a gene has when printing out the gene
-    @JsonManagedReference
+    // @JsonBackReference is needed to avoid infinite loops when converting objects to JSON
+    // this setup will not show the list of diseases a gene has when printing out the gene
+    // but will show the gene associated with the disease when we print out a disease with using @JsonManagedReference on that side
+    @JsonBackReference
     private List<Disease> diseases;
 
     public Gene() {
