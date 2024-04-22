@@ -26,7 +26,8 @@ public class Gene {
     // @JsonBackReference is needed to avoid infinite loops when converting objects to JSON
     // this setup will not show the list of diseases a gene has when printing out the gene
     // but will show the gene associated with the disease when we print out a disease with using @JsonManagedReference on that side
-    @JsonBackReference
+//    @JsonBackReference
+    @JsonManagedReference
     private List<Disease> diseases;
 
     public Gene() {

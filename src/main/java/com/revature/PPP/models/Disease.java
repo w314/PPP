@@ -24,7 +24,8 @@ public class Disease {
     // this setup will print out the gene object associated with the disease when we print the disease
     // to avoid a loop the list of diseases that belong to a gene will not be printed out
     // for that we mark the gene class with @JsonBackReference
-    @JsonManagedReference
+//    @JsonManagedReference
+    @JsonBackReference
     @JoinColumn(name = "geneId")
     private Gene gene;
 
