@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories("com.revature.PPP.daos")
 public class PppApplication {
 
+	// this command provided by Spring JPA will start the server
 	public static void main(String[] args) {
 		SpringApplication.run(PppApplication.class, args);
 	}
