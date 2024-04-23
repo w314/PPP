@@ -52,15 +52,14 @@ public class DiseaseController {
     }
 
     @GetMapping("/genes/{geneId}")
-    public ResponseEntity<List<Disease>> getAllDiseasesByGeneId(@PathVariable int geneId){
+    public ResponseEntity<Object> getAllDiseasesByGeneId(@PathVariable int geneId){
 
         List<Disease> diseases = diseaseDAO.findByGeneGeneId(geneId);
         //Disease ds = diseaseDAO.findByGeneGeneId(geneId);
 
         if (diseases.isEmpty()) {
             // Return a ResponseEntity with status 404 (Not Found) and an error message
-            return ResponseEntity.notFound().build();
-           // return ResponseEntity.status(404).body("No Disease record found for gene ID: " + geneId);
+            return ResponseEntity.status(404).body("No Disease record found for gene ID: " + geneId);
         }
 
         //return a ResponseEntity with status 200 (ok), and the user in the body
@@ -81,12 +80,22 @@ public class DiseaseController {
             return ResponseEntity.badRequest().body("Please enter a Disease with  a valid gene ID!");
         }
 
-        // Check if the disease with the same gene already exists
-        List<Disease> existingDisease = diseaseDAO.findByGeneGeneId(geneId);
+//        // Check if the disease with the same gene already exists
+//        List<Disease> existingDisease = diseaseDAO.findByGeneGeneId(geneId);
+//
+//        if (!existingDisease.isEmpty()) {
+//            return ResponseEntity.badRequest().body(existingDisease + " with the Gene ID " + geneId + "already exists!");
+//        }
 
-        if (!existingDisease.isEmpty()) {
-            return ResponseEntity.badRequest().body(existingDisease + " with the Gene ID " + geneId + "already exists!");
+
+        // check if a disease with same name already exist and send bad request if it does
+        String diseaseName = disease.getDiseaseName();
+        List<Disease> existingDiseases = diseaseDAO.findByDiseaseName(diseaseName);
+        if(!existingDiseases.isEmpty()) {
+            return ResponseEntity.badRequest().body("The disease name " + diseaseName + " already exists in the database.");
         }
+
+
         Gene g =oG.get();
         disease.setGene(g);
         Disease d = diseaseDAO.save(disease);
@@ -95,65 +104,65 @@ public class DiseaseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(d);
     }
 
-    // Replace an existing Disease
-    @PutMapping("/{geneId}")
-    public ResponseEntity<Object> updateDisease(@RequestBody Disease disease, @PathVariable int geneId){
-
-        Optional<Gene> oG= geneDAO.findById(geneId);
-        // Gene g = geneDAO.findById(geneId).get();
-        // Alternatively
-        // Gene g = geneDAO.findById(geneId).orElse(null); // Provide a default value (null in this case)
-
-        if(oG.isEmpty()) {
-            return ResponseEntity.badRequest().body("Gene not found for ID: " + geneId);
-        }
-
-        Gene g = oG.get();
-        disease.setGene(g);
-        // Check if the disease with the same gene already exists
-        List<Disease> existingDiseases = diseaseDAO.findByGeneGeneId(geneId);
-        for (Disease existingDisease : existingDiseases) {
-            // Check if the disease to be updated already exists
-            if (existingDisease.getDiseaseName().equals(disease.getDiseaseName())) {
-                return ResponseEntity.badRequest().body(disease.getDiseaseName() +" with gene ID: " + geneId + " already exists!");
-            }
-        }
-
-        Disease d = diseaseDAO.save(disease); //updates and inserts use the SAME JPA METHOD, save()
-
-        //if we send a Disease with no PK, it knows to create a new Disease
-        //if we send a Disease with an EXISTING PK, it knows to update the existing Disease
-
-        return ResponseEntity.ok(d);
-
-    }
+//    // Replace an existing Disease
+//    @PutMapping("/{geneId}")
+//    public ResponseEntity<Object> updateDisease(@RequestBody Disease disease, @PathVariable int geneId){
 //
-//    // updates the disease (with the disease id in the URI) with the new values provided
-//    @PutMapping("/{diseaseId}")
-//    public ResponseEntity<Object> updateADisease(@PathVariable int diseaseId, @RequestBody Disease disease) {
+//        Optional<Gene> oG= geneDAO.findById(geneId);
+//        // Gene g = geneDAO.findById(geneId).get();
+//        // Alternatively
+//        // Gene g = geneDAO.findById(geneId).orElse(null); // Provide a default value (null in this case)
 //
-//        // check if disease ID is valid
-//        Optional<Disease> diseaseOptional = diseaseDAO.findById(diseaseId);
-//
-//        // if there is no disease with the provided id return bad not found error
-//        if(diseaseOptional.isEmpty()) {
-//            return ResponseEntity.status(404).body("There is no disease with ID: " + diseaseId);
+//        if(oG.isEmpty()) {
+//            return ResponseEntity.badRequest().body("Gene not found for ID: " + geneId);
 //        }
 //
-//        // if we have the disease get it from the Optional container
-//        Disease d =  (Disease) diseaseOptional.get();
+//        Gene g = oG.get();
+//        disease.setGene(g);
+//        // Check if the disease with the same gene already exists
+//        List<Disease> existingDiseases = diseaseDAO.findByGeneGeneId(geneId);
+//        for (Disease existingDisease : existingDiseases) {
+//            // Check if the disease to be updated already exists
+//            if (existingDisease.getDiseaseName().equals(disease.getDiseaseName())) {
+//                return ResponseEntity.badRequest().body(disease.getDiseaseName() +" with gene ID: " + geneId + " already exists!");
+//            }
+//        }
 //
-//        // update old values with the new ones
-//        d.setDiseaseName(disease.getDiseaseName());
-//        d.setSeverity(disease.getSeverity());
-//        d.setGene(disease.getGene());
+//        Disease d = diseaseDAO.save(disease); //updates and inserts use the SAME JPA METHOD, save()
 //
-//        // save our updated disease to the DB
-//        Disease updatedDisease = diseaseDAO.save(disease);
+//        //if we send a Disease with no PK, it knows to create a new Disease
+//        //if we send a Disease with an EXISTING PK, it knows to update the existing Disease
 //
-//        // send response with the updated disease in the body
-//        return ResponseEntity.ok().body(updatedDisease);
+//        return ResponseEntity.ok(d);
+//
 //    }
+
+    // updates the disease (with the disease id in the URI) with the new values provided
+    @PutMapping("/{diseaseId}")
+    public ResponseEntity<Object> updateADisease(@PathVariable int diseaseId, @RequestBody Disease disease) {
+
+        // check if disease ID is valid
+        Optional<Disease> diseaseOptional = diseaseDAO.findById(diseaseId);
+
+        // if there is no disease with the provided id return not found error
+        if(diseaseOptional.isEmpty()) {
+            return ResponseEntity.status(404).body("There is no disease with ID: " + diseaseId);
+        }
+
+        // if we have the disease get it from the Optional container
+        Disease d =  (Disease) diseaseOptional.get();
+
+        // update old values with the new ones
+        d.setDiseaseName(disease.getDiseaseName());
+        d.setSeverity(disease.getSeverity());
+        d.setGene(disease.getGene());
+
+        // save our updated disease to the DB
+        Disease updatedDisease = diseaseDAO.save(disease);
+
+        // send response with the updated disease in the body
+        return ResponseEntity.accepted().body(updatedDisease);
+    }
 
 
     // Delete a Disease by its ID
